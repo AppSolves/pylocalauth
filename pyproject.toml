@@ -1,6 +1,6 @@
 [project]
 name = "pylocalauth"
-version = "1.0.0"
+dynamic = ["version"]
 description = "Cross-platform local authentication library for Python applications."
 authors = [{ name = "Kaan Gönüldinc", email = "contact@appsolves.dev" }]
 license = "Apache-2.0"

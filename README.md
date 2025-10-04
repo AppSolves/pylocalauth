@@ -33,15 +33,24 @@ Add local authentication to your Python applications with ease. `pylocalauth` pr
 | **Lightweight**: Minimal dependencies and easy to install. | ✅ |
 
 <br>
-<p align="center">
-  <kbd>
-  <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/windows.png?sanitize=true" alt="Windows Example" width="450"/>
-</kbd>
-&nbsp;&nbsp;&nbsp;
-<kbd>
-    <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/linux.png?sanitize=true" alt="Linux Example" width="450"/>
-  </kbd>
-</p>
+<table>
+  <tr>
+    <td align="center"><b>Windows Example</b></td>
+    <td align="center"><b>Linux Example</b></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <kbd>
+        <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/windows.png?sanitize=true" alt="Windows Example" width="400"/>
+      </kbd>
+    </td>
+    <td align="center">
+      <kbd>
+        <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/linux.png?sanitize=true" alt="Linux Example" width="400"/>
+      </kbd>
+    </td>
+  </tr>
+</table>
 <br>
 
 ## Installation

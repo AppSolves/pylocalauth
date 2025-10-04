@@ -32,6 +32,72 @@ Add local authentication to your Python applications with ease. `pylocalauth` pr
 | **Secure**: Utilizes platform-specific security features to ensure user data is protected. | ✅ |
 | **Lightweight**: Minimal dependencies and easy to install. | ✅ |
 
+<br>
+<p align="center">
+  <kbd>
+  <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/windows.png?sanitize=true" alt="Windows Example" width="450"/>
+</kbd>
+&nbsp;&nbsp;&nbsp;
+<kbd>
+    <img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/usage/linux.png?sanitize=true" alt="Linux Example" width="450"/>
+  </kbd>
+</p>
+<br>
+
+## Installation
+
+You can install `pylocalauth` via pip:
+
+```bash
+pip install pylocalauth --upgrade
+```
+
+## Usage
+
+Here's a very simple example of how to use `pylocalauth` to authenticate a user:
+
+```python
+from pylocalauth import authenticate # Import the authenticate function for your platform
+result = authenticate()
+if result:
+    print("Authentication successful!")
+else:
+    print("Authentication failed.")
+```
+
+You can also customize the message displayed during authentication:
+
+```python
+from pylocalauth import authenticate
+result = authenticate(message="Please authenticate to proceed.")
+```
+
+By default, `pylocalauth` will raise an `AuthUnavailableError` if authentication is not available on the current platform. You can disable this behavior by setting the `check_availability` parameter to `False` (You should only do this if you plan to handle the unavailability yourself):
+
+```python
+from pylocalauth import authenticate, is_available
+from pylocalauth.exceptions import AuthError, AuthUnavailableError
+
+# Let it handle availability automatically
+try:
+    result = authenticate(check_availability=True) # default
+    print(f"Authentication successful?: {result}")
+except AuthUnavailableError:
+    print("Authentication is not available on this platform.")
+except AuthError as e:
+    print(f"An error occurred: {e}")
+
+# Handle availability yourself
+try:
+    if not is_available():
+        print("Authentication is not available on this platform.")
+    else:
+        result = authenticate(check_availability=False)
+        print(f"Authentication successful?: {result}")
+except AuthError as e:
+    print(f"An error occurred: {e}")
+```
+
 ## Contributing
 
 We welcome contributions from the community! If you'd like to contribute, please follow the steps explained in the [CONTRIBUTORS](CONTRIBUTORS.md) file.

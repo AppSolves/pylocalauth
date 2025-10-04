@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "winrt-Windows.Security.Credentials.UI; sys_platform=='win32'",
+    "winrt-Windows.Foundation; sys_platform=='win32'",
     "pyobjc; sys_platform=='darwin'",
     "pyobjc-framework-LocalAuthentication; sys_platform=='darwin'",
     "python-pam; sys_platform=='linux'",

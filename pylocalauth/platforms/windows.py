@@ -5,10 +5,10 @@ Provides synchronous and asynchronous functions to authenticate users
 via *Windows Hello* (biometrics or PIN). Includes availability checks
 and detailed exceptions. Logging is included for debugging purposes.
 
-**NOTE**: This module requires the `winrt-Windows.Security.Credentials.UI` package.
-Install it via pip if not already installed:
+**NOTE**: This module requires the `winrt-Windows.Security.Credentials.UI` and
+`winrt-Windows.Foundation` packages. Install them via pip if not already installed:
 ```python
-pip install winrt-Windows.Security.Credentials.UI --upgrade
+pip install winrt-Windows.Security.Credentials.UI winrt-Windows.Foundation --upgrade
 ```
 
 **This API requires `Windows 10` or later.**
@@ -31,7 +31,8 @@ try:
     from winrt.windows.security.credentials.ui import UserConsentVerifier as _Verifier
 except ImportError:
     raise RequiredLibError(
-        "Windows authentication requires `winrt` package "
+        "Windows authentication requires the `winrt-Windows.Security.Credentials.UI` "
+        "and `winrt-Windows.Foundation` packages "
         "(`pip install winrt-Windows.Security.Credentials.UI --upgrade`)."
     )
 

@@ -34,8 +34,8 @@ try:
     )
 except ImportError:
     raise RequiredLibError(
-        "macOS authentication requires `pyobjc` and `pyobjc-framework-LocalAuthentication` "
-        "(`pip install pyobjc pyobjc-framework-LocalAuthentication --upgrade`)."
+        "macOS authentication requires the `pyobjc` and `pyobjc-framework-LocalAuthentication` "
+        "packages (`pip install pyobjc pyobjc-framework-LocalAuthentication --upgrade`)."
     )
 
 

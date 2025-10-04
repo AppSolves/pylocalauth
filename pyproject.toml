@@ -30,7 +30,7 @@ Repository = "https://github.com/AppSolves/pylocalauth"
 Documentation = "https://github.com/AppSolves/pylocalauth/blob/main/README.md"
 
 [build-system]
-requires = ["hatchling", "hatch-regex-commit", "click<8.3.0"]
+requires = ["hatchling", "hatch-regex-commit", "click<8.4.0"]
 build-backend = "hatchling.build"
 
 [tool.mypy]

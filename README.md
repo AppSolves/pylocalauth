@@ -32,6 +32,22 @@ Add local authentication to your Python applications with ease. `pylocalauth` pr
 | **Secure**: Utilizes platform-specific security features to ensure user data is protected. | ✅ |
 | **Lightweight**: Minimal dependencies and easy to install. | ✅ |
 
+## Contributing
+
+We welcome contributions from the community! If you'd like to contribute, please follow the steps explained in the [CONTRIBUTORS](CONTRIBUTORS.md) file.
+
+#### Contributions Needed
+
+We are especially looking for help with the following:
+
+- **macOS support:** Testing, bug reports, and improvements for the macOS backend.
+- **Documentation & Tests:** Examples, API docs, tests (using `pytest` and `pytest-asyncio`) and usage guides.
+- **CI/CD:** Enhancements to cross-platform test automation.
+- **New authentication methods:** Suggestions or PRs for additional local authentication backends.
+- **Issue triage:** Help us reproduce and resolve open issues.
+
+If you want to help, please see [CONTRIBUTORS](CONTRIBUTORS.md) and open an issue or pull request!
+
 ## Development
 
 ### Setup environment

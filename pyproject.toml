@@ -15,12 +15,16 @@ dependencies = [
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
+    "Framework :: Hatch",
+    "Framework :: Pytest",
+    "Framework :: AsyncIO",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Security :: Authentication",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration :: Authentication/Directory",
 ]
 
 [project.urls]

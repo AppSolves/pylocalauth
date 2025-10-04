@@ -1,33 +1,36 @@
 <p align="center">
-  <kbd><img src="https://raw.githubusercontent.com/AppSolves/fastapi-users-db-dynamodb/refs/heads/main/assets/github/repo_card.png?sanitize=true" alt="FastAPI Users DynamoDB Adapter"></kbd>
+  <kbd><img src="https://raw.githubusercontent.com/AppSolves/pylocalauth/refs/heads/main/assets/github/repo_card.png?sanitize=true" alt="pylocalauth"></kbd>
 </p>
 <br>
 
-# FastAPI Users - Database adapter for AWS DynamoDB
+# `pylocalauth`
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/frankie567/fastapi-users/master/logo.svg?sanitize=true" alt="FastAPI Users">
-</p>
+<p align="center">Cross-platform local authentication library for Python applications.</p>
+<br>
 
-<p align="center">
-    <em>Ready-to-use and customizable users management for FastAPI</em>
-</p>
-
-[![build](https://github.com/AppSolves/fastapi-users-db-dynamodb/workflows/Build/badge.svg)](https://github.com/fastapi-users/fastapi-users/actions)
-[![PyPI version](https://badge.fury.io/py/fastapi-users-db-dynamodb.svg)](https://badge.fury.io/py/fastapi-users-db-dynamodb)
-[![Downloads](https://pepy.tech/badge/fastapi-users-db-dynamodb)](https://pepy.tech/project/fastapi-users-db-dynamodb)
+[![build](https://github.com/AppSolves/pylocalauth/workflows/Build/badge.svg)](https://github.com/AppSolves/pylocalauth/actions)
+[![PyPI version](https://badge.fury.io/py/pylocalauth.svg)](https://badge.fury.io/py/pylocalauth)
+[![Downloads](https://pepy.tech/badge/pylocalauth)](https://pepy.tech/project/pylocalauth)
 
 ---
 
-**Documentation**: <a href="https://fastapi-users.github.io/fastapi-users/" target="_blank">https://fastapi-users.github.io/fastapi-users/</a>
+**Documentation**: <a href="https://github.com/AppSolves/pylocalauth/blob/main/README.md" target="_blank">README</a>
 
-**Source Code**: <a href="https://github.com/fastapi-users/fastapi-users" target="_blank">https://github.com/fastapi-users/fastapi-users</a>
+**Source Code**: <a href="https://github.com/AppSolves/pylocalauth" target="_blank">Repository</a>
 
 ---
 
-Add quickly a registration and authentication system to your [FastAPI](https://fastapi.tiangolo.com/) project. **FastAPI Users** is designed to be as customizable and adaptable as possible.
+Add local authentication to your Python applications with ease. `pylocalauth` provides a simple and secure way to authenticate users using platform-specific methods such as passwords, biometrics, and PINs.
 
-**Sub-package for AWS DynamoDB support in FastAPI Users.**
+## Features
+
+| Feature | Status |
+|---------|:------:|
+| **Cross-platform**: Works on Windows, macOS, and Linux. (*macOS is still in beta, but it should work reliably*) | ✅ |
+| **Multiple authentication methods**: Supports password-based, biometric (Windows Hello, Touch ID, etc.), and PIN-based authentication. | ✅ |
+| **Easy integration**: Simple API for integrating local authentication into your Python applications. | ✅ |
+| **Secure**: Utilizes platform-specific security features to ensure user data is protected. | ✅ |
+| **Lightweight**: Minimal dependencies and easy to install. | ✅ |
 
 ## Development
 
@@ -54,4 +57,4 @@ hatch run lint
 ## License
 
 This project is licensed under the terms of the Apache 2.0 license.
-See the LICENSE and NOTICE files for more information.
+See the [LICENSE](LICENSE) file for more information.

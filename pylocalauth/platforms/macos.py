@@ -27,7 +27,6 @@ __all__ = ["is_available", "is_available_async", "authenticate", "authenticate_a
 
 try:
     import objc
-    from Foundation import NSObject
     from LocalAuthentication import (
         LAContext,
         LAPolicyDeviceOwnerAuthentication,

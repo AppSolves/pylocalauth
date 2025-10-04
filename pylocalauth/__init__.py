@@ -10,11 +10,26 @@ from .exceptions import AuthError, AuthUnavailableError, RequiredLibError
 
 match platform.system():
     case "Windows":
-        from .platforms.windows import *
+        from .platforms.windows import (
+            authenticate,
+            authenticate_async,
+            is_available,
+            is_available_async,
+        )
     case "Darwin":
-        from .platforms.macos import *
+        from .platforms.macos import (
+            authenticate,
+            authenticate_async,
+            is_available,
+            is_available_async,
+        )
     case "Linux":
-        from .platforms.linux import *
+        from .platforms.linux import (
+            authenticate,
+            authenticate_async,
+            is_available,
+            is_available_async,
+        )
     case _:
         raise ImportError(f"Unsupported platform: {platform.system()}")
 

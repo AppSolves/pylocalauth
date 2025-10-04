@@ -18,7 +18,7 @@ import asyncio
 import logging
 from typing import Any
 
-from ..exceptions import AuthUnavailableError, RequiredLibError
+from ..exceptions import AuthError, AuthUnavailableError, RequiredLibError
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -43,23 +43,29 @@ async def is_available_async() -> bool:
     """
     Asynchronously checks if biometric authentication is available on this device.
 
-    :return: True if available, False otherwise
+    :return: `True` if available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
-    logger.debug("Checking macOS biometric authentication availability...")
-    context = LAContext.alloc().init()
-    error = objc.nil
-    available = context.canEvaluatePolicy_error_(
-        LAPolicyDeviceOwnerAuthenticationWithBiometrics, error
-    )
-    logger.debug(f"macOS biometric authentication available: {bool(available)}")
-    return bool(available)
+    try:
+        logger.debug("Checking macOS biometric authentication availability...")
+        context = LAContext.alloc().init()
+        error = objc.nil
+        available = context.canEvaluatePolicy_error_(
+            LAPolicyDeviceOwnerAuthenticationWithBiometrics, error
+        )
+        logger.debug(f"macOS biometric authentication available: {bool(available)}")
+        return bool(available)
+    except Exception as e:
+        logger.error(f"Error checking macOS biometric availability: {e}")
+        raise AuthError("Failed to check macOS biometric availability") from e
 
 
 def is_available() -> bool:
     """
-    Synchronously checks if biometric authentication is available on this device.
+    Synchronously checks if biometric authentication is available on this device using `asyncio.run`.
 
-    :return: True if available, False otherwise
+    :return: `True` if available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
     return asyncio.run(is_available_async())
 
@@ -72,51 +78,63 @@ async def authenticate_async(
     Asynchronously performs macOS authentication.
 
     :param message: Message to display in the authentication prompt
-    :param check_availability: If True, raises AuthError if not available
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if authentication is not available and check_availability is True
+    :param check_availability: If `True`, raises `AuthUnavailableError` if not available
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if authentication is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    logger.debug("Starting async macOS authentication...")
-    context = LAContext.alloc().init()
-    error = objc.nil
+    try:
+        logger.debug("Starting async macOS authentication...")
+        context = LAContext.alloc().init()
+        error = objc.nil
 
-    if check_availability:
-        available = context.canEvaluatePolicy_error_(
-            LAPolicyDeviceOwnerAuthentication, error
+        if check_availability:
+            available = context.canEvaluatePolicy_error_(
+                LAPolicyDeviceOwnerAuthentication, error
+            )
+            if not available:
+                logger.warning("macOS authentication is not available.")
+                raise AuthUnavailableError("macOS authentication is not available.")
+            logger.debug("macOS authentication is available.")
+
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
+
+        def reply(success: bool, error_obj: Any) -> None:
+            if success:
+                logger.info("macOS authentication succeeded.")
+                loop.call_soon_threadsafe(future.set_result, True)
+            else:
+                if error_obj:
+                    logger.debug(f"macOS auth error object: {error_obj}")
+                logger.warning("macOS authentication failed.")
+                loop.call_soon_threadsafe(future.set_result, False)
+
+        context.evaluatePolicy_localizedReason_reply_(
+            LAPolicyDeviceOwnerAuthentication,
+            message,
+            reply,
         )
-        if not available:
-            logger.warning("macOS authentication is not available.")
-            raise AuthUnavailableError("macOS authentication is not available.")
-        logger.debug("macOS authentication is available.")
 
-    loop = asyncio.get_running_loop()
-    future = loop.create_future()
-
-    def reply(success: bool, error_obj: Any) -> None:
-        if success:
-            logger.info("macOS authentication succeeded.")
-            loop.call_soon_threadsafe(future.set_result, True)
-        else:
-            if error_obj:
-                logger.debug(f"macOS auth error object: {error_obj}")
-            logger.warning("macOS authentication failed.")
-            loop.call_soon_threadsafe(future.set_result, False)
-
-    context.evaluatePolicy_localizedReason_reply_(
-        LAPolicyDeviceOwnerAuthentication,
-        message,
-        reply,
-    )
-
-    return await future
+        return await future
+    except AuthUnavailableError:
+        raise
+    except Exception as e:
+        logger.error(f"Error during macOS authentication: {e}")
+        raise AuthError("macOS authentication failed due to an error") from e
 
 
-def authenticate(message: str = "Authenticate to continue") -> bool:
+def authenticate(
+    message: str = "Authenticate to continue",
+    check_availability: bool = True,
+) -> bool:
     """
-    Synchronously performs macOS authentication.
+    Synchronously performs macOS authentication using `asyncio.run`.
 
     :param message: Message to display in the authentication prompt
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if authentication is not available
+    :param check_availability: If `True`, raises `AuthUnavailableError` if not available
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if authentication is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    return asyncio.run(authenticate_async(message))
+    return asyncio.run(authenticate_async(message, check_availability))

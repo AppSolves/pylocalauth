@@ -17,7 +17,7 @@ pip install winrt-Windows.Security.Credentials.UI winrt-Windows.Foundation --upg
 import asyncio
 import logging
 
-from ..exceptions import AuthUnavailableError, RequiredLibError
+from ..exceptions import AuthError, AuthUnavailableError, RequiredLibError
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -41,20 +41,26 @@ async def is_available_async() -> bool:
     """
     Asynchronously checks if Windows Hello is available on this device.
 
-    :return: True if Windows Hello is available, False otherwise
+    :return: `True` if Windows Hello is available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
-    logger.debug("Checking Windows Hello availability...")
-    availability = await _Verifier.check_availability_async()
-    is_available = availability == 0  # 0 == Available
-    logger.debug(f"Windows Hello available: {is_available}")
-    return is_available
+    try:
+        logger.debug("Checking Windows Hello availability...")
+        availability = await _Verifier.check_availability_async()
+        is_available = availability == 0  # 0 == Available
+        logger.debug(f"Windows Hello available: {is_available}")
+        return is_available
+    except Exception as e:
+        logger.error(f"Error checking Windows Hello availability: {e}")
+        raise AuthError("Failed to check Windows Hello availability") from e
 
 
 def is_available() -> bool:
     """
     Synchronously checks if Windows Hello is available on this device using `asyncio.run`.
 
-    :return: True if Windows Hello is available, False otherwise
+    :return: `True` if Windows Hello is available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
     return asyncio.run(is_available_async())
 
@@ -67,33 +73,45 @@ async def authenticate_async(
     Asynchronously performs Windows Hello authentication.
 
     :param message: Message to display in the Windows Hello prompt
-    :param check_availability: If True, raises AuthError if Hello is not available
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if Windows Hello is not available and check_availability is True
+    :param check_availability: If `True`, raises `AuthUnavailableError` if Hello is not available
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if Windows Hello is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    logger.debug("Starting async Windows Hello authentication...")
-    if check_availability:
-        available = await is_available_async()
-        if not available:
-            logger.warning("Windows Hello authentication is not available.")
-            raise AuthUnavailableError("Windows authentication is not available.")
-        logger.debug("Windows Hello is available.")
+    try:
+        logger.debug("Starting async Windows Hello authentication...")
+        if check_availability:
+            available = await is_available_async()
+            if not available:
+                logger.warning("Windows Hello authentication is not available.")
+                raise AuthUnavailableError("Windows authentication is not available.")
+            logger.debug("Windows Hello is available.")
 
-    result = await _Verifier.request_verification_async(message)
-    success = result == VerificationResult.VERIFIED
-    if success:
-        logger.info("Windows Hello authentication succeeded.")
-    else:
-        logger.warning("Windows Hello authentication failed.")
-    return success
+        result = await _Verifier.request_verification_async(message)
+        success = result == VerificationResult.VERIFIED
+        if success:
+            logger.info("Windows Hello authentication succeeded.")
+        else:
+            logger.warning("Windows Hello authentication failed.")
+        return success
+    except AuthUnavailableError:
+        raise
+    except Exception as e:
+        logger.error(f"Error during Windows Hello authentication: {e}")
+        raise AuthError("Windows Hello authentication failed due to an error") from e
 
 
-def authenticate(message: str = "Authenticate to continue") -> bool:
+def authenticate(
+    message: str = "Authenticate to continue",
+    check_availability: bool = True,
+) -> bool:
     """
     Synchronously performs Windows Hello authentication using `asyncio.run`.
 
     :param message: Message to display in the Windows Hello prompt
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if Windows Hello is not available
+    :param check_availability: If `True`, raises `AuthUnavailableError` if Hello is not available
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if Windows Hello is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    return asyncio.run(authenticate_async(message))
+    return asyncio.run(authenticate_async(message, check_availability))

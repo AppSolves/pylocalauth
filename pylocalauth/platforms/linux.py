@@ -1,8 +1,8 @@
 """
-Linux PAM Authentication for Python
+**Linux PAM Authentication for Python**
 
 Provides synchronous and asynchronous functions to authenticate users
-via PAM (Pluggable Authentication Modules). Includes availability checks
+via *PAM (Pluggable Authentication Modules)*. Includes availability checks
 and detailed exceptions. Logging is included for debugging purposes.
 
 **NOTE**: This module requires the `python-pam` and `six` packages.
@@ -16,7 +16,7 @@ import asyncio
 import getpass
 import logging
 
-from ..exceptions import AuthUnavailableError, RequiredLibError
+from ..exceptions import AuthError, AuthUnavailableError, RequiredLibError
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -36,20 +36,25 @@ async def is_available_async() -> bool:
     """
     Asynchronously checks if PAM authentication is available on this device.
 
-    :return: True if available, False otherwise
+    :return: `True` if available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
-    logger.debug("Checking Linux PAM authentication availability...")
-    # On most Linux systems, PAM is always available if the module is importable
-    available = True
-    logger.debug(f"Linux PAM authentication available: {available}")
-    return available
+    try:
+        logger.debug("Checking Linux PAM authentication availability...")
+        available = True  # If pam is importable, PAM is available
+        logger.debug(f"Linux PAM authentication available: {available}")
+        return available
+    except Exception as e:
+        logger.error(f"Error checking Linux PAM availability: {e}")
+        raise AuthError("Failed to check Linux PAM availability") from e
 
 
 def is_available() -> bool:
     """
-    Synchronously checks if PAM authentication is available on this device.
+    Synchronously checks if PAM authentication is available on this device using `asyncio.run`.
 
-    :return: True if available, False otherwise
+    :return: `True` if available, `False` otherwise
+    :raises AuthError: if checking availability fails
     """
     return asyncio.run(is_available_async())
 
@@ -63,54 +68,63 @@ async def authenticate_async(
     Asynchronously performs Linux PAM authentication.
 
     :param message: Message to display in the authentication prompt
-    :param check_availability: If True, raises AuthError if not available
+    :param check_availability: If `True`, raises `AuthUnavailableError` if not available
     :param username: Username to authenticate (defaults to current user)
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if authentication is not available and check_availability is True
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if authentication is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    logger.debug("Starting async Linux PAM authentication...")
-    if check_availability:
-        available = await is_available_async()
-        if not available:
-            logger.warning("Linux PAM authentication is not available.")
-            raise AuthUnavailableError("Linux PAM authentication is not available.")
-        logger.debug("Linux PAM authentication is available.")
+    try:
+        logger.debug("Starting async Linux PAM authentication...")
+        if check_availability:
+            available = await is_available_async()
+            if not available:
+                logger.warning("Linux PAM authentication is not available.")
+                raise AuthUnavailableError("Linux PAM authentication is not available.")
+            logger.debug("Linux PAM authentication is available.")
 
-    if username is None:
-        username = getpass.getuser()
+        if username is None:
+            username = getpass.getuser()
 
-    loop = asyncio.get_running_loop()
-    future = loop.create_future()
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
 
-    def prompt_password():
-        try:
-            password = getpass.getpass(f"{message} (user: {username}): ")
-            p = pam.pam()
-            success = p.authenticate(username, password)
-            logger.info(
-                "Linux PAM authentication succeeded."
-                if success
-                else "Linux PAM authentication failed."
-            )
-            loop.call_soon_threadsafe(future.set_result, success)
-        except Exception as e:
-            logger.error(f"Linux PAM authentication error: {e}")
-            loop.call_soon_threadsafe(future.set_result, False)
+        def prompt_password():
+            try:
+                password = getpass.getpass(f"{message} (user: {username}): ")
+                p = pam.pam()
+                success = p.authenticate(username, password)
+                if success:
+                    logger.info("Linux PAM authentication succeeded.")
+                else:
+                    logger.warning("Linux PAM authentication failed.")
+                loop.call_soon_threadsafe(future.set_result, success)
+            except Exception as e:
+                logger.error(f"Linux PAM authentication error: {e}")
+                loop.call_soon_threadsafe(future.set_exception, e)
 
-    await loop.run_in_executor(None, prompt_password)
-    return await future
+        await loop.run_in_executor(None, prompt_password)
+        return await future
+    except AuthUnavailableError:
+        raise
+    except Exception as e:
+        logger.error(f"Error during Linux PAM authentication: {e}")
+        raise AuthError("Linux PAM authentication failed due to an error") from e
 
 
 def authenticate(
     message: str = "Authenticate to continue",
+    check_availability: bool = True,
     username: str | None = None,
 ) -> bool:
     """
-    Synchronously performs Linux PAM authentication.
+    Synchronously performs Linux PAM authentication using `asyncio.run`.
 
     :param message: Message to display in the authentication prompt
+    :param check_availability: If `True`, raises `AuthUnavailableError` if not available
     :param username: Username to authenticate (defaults to current user)
-    :return: True if authentication succeeds, False otherwise
-    :raises AuthError: if authentication is not available
+    :return: `True` if authentication succeeds, `False` otherwise
+    :raises AuthUnavailableError: if authentication is not available and `check_availability` is `True`
+    :raises AuthError: if authentication fails due to an error
     """
-    return asyncio.run(authenticate_async(message, username=username))
+    return asyncio.run(authenticate_async(message, check_availability, username))

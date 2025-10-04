@@ -1,5 +1,7 @@
 """
 Local authentication using system biometric or password authentication.
+
+*Automatically imports the appropriate platform-specific module based on the operating system.*
 """
 
 __version__ = "1.0.0"

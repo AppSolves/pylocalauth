@@ -5,10 +5,10 @@ Provides synchronous and asynchronous functions to authenticate users
 via PAM (Pluggable Authentication Modules). Includes availability checks
 and detailed exceptions. Logging is included for debugging purposes.
 
-**NOTE**: This module requires the `python-pam` package.
-Install it via pip if not already installed:
+**NOTE**: This module requires the `python-pam` and `six` packages.
+Install them via pip if not already installed:
 ```python
-pip install python-pam --upgrade
+pip install python-pam six --upgrade
 ```
 """
 
@@ -27,8 +27,8 @@ try:
     import pam
 except ImportError:
     raise RequiredLibError(
-        "Linux authentication requires the `python-pam` package "
-        "(`pip install python-pam --upgrade`)."
+        "Linux authentication requires the `python-pam` and `six` packages "
+        "(`pip install python-pam six --upgrade`)."
     )
 
 

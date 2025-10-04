@@ -13,6 +13,7 @@ dependencies = [
     "pyobjc; sys_platform=='darwin'",
     "pyobjc-framework-LocalAuthentication; sys_platform=='darwin'",
     "python-pam; sys_platform=='linux'",
+    "six; sys_platform=='linux'",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

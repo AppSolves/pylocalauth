@@ -68,6 +68,7 @@ installer = "uv"
 dependencies = [
     "pytest",
     "pytest-asyncio",
+    "pytest-lazy-fixture",
     "pytest-cov",
     "mypy",
     "black",

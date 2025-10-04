@@ -1,0 +1,80 @@
+[project]
+name = "pylocalauth"
+version = "1.0.0"
+description = "Cross-platform local authentication library for Python applications."
+authors = [{ name = "Kaan Gönüldinc", email = "contact@appsolves.dev" }]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "winrt-Windows.Security.Credentials.UI; sys_platform=='win32'",
+    "pyobjc; sys_platform=='darwin'",
+    "pyobjc-framework-LocalAuthentication; sys_platform=='darwin'",
+    "python-pam; sys_platform=='linux'",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security :: Authentication",
+]
+
+[project.urls]
+Homepage = "https://appsolves.dev"
+Repository = "https://github.com/AppSolves/pylocalauth"
+"Bug Reports" = "https://github.com/AppSolves/pylocalauth/issues"
+Documentation = "https://github.com/AppSolves/pylocalauth/blob/main/README.md"
+
+[build-system]
+requires = ["hatchling", "hatch-regex-commit", "click<8.3.0"]
+build-backend = "hatchling.build"
+
+[tool.mypy]
+plugins = []
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+addopts = "--ignore=test_build.py --strict-markers"
+filterwarnings = ["ignore::DeprecationWarning"]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+extend-select = ["I", "UP"]
+
+[tool.hatch]
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+source = "regex_commit"
+commit_extra_args = ["-e"]
+path = "pylocalauth/__init__.py"
+
+[tool.hatch.envs.default]
+installer = "uv"
+dependencies = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "mypy",
+    "black",
+    "ruff",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest --cov=pylocalauth/ --cov-report=term-missing --cov-fail-under=100"
+test-cov-xml = "pytest --cov=pylocalauth/ --cov-report=xml --cov-fail-under=100"
+lint = ["ruff format .", "ruff check --fix .", "mypy pylocalauth/"]
+lint-check = ["ruff format --check .", "ruff check .", "mypy pylocalauth/"]
+
+[tool.hatch.build.targets.sdist]
+support-legacy = true
